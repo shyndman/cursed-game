@@ -87,7 +87,7 @@ def _resolve_gate(chamber, packet):
     del chamber
     packet["trace"].append("gate")
     packet["gate"] = packet["token"]
-    packet["slot"] = atoms.AT[packet["gate"]]
+    packet["slot"] = atoms.at()[packet["gate"]]
     return packet
 
 

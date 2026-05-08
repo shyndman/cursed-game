@@ -5,22 +5,23 @@ def _decode(*codes):
     return "".join(chr(code) for code in codes)
 
 
-VOCABLES = {
-    "crown": _decode(119, 105, 110, 110, 101, 114),
-    "thread": _decode(115, 101, 97, 109),
-    "still": _decode(100, 114, 97, 119),
-    "void": _decode(78, 111, 110, 101),
-    "turn": _decode(110, 101, 120, 116),
-    "hatch": _decode(111, 112, 101, 110),
-}
+def _vocables():
+    return {
+        "crown": _decode(119, 105, 110, 110, 101, 114),
+        "thread": _decode(115, 101, 97, 109),
+        "still": _decode(100, 114, 97, 119),
+        "void": _decode(78, 111, 110, 101),
+        "turn": _decode(110, 101, 120, 116),
+        "hatch": _decode(111, 112, 101, 110),
+    }
 
 
 class Match:
     def __init__(self, first_spec, second_spec, chorus=True):
         self.chamber = rituals.Chamber()
         self.hands = {
-            atoms.SIGNS[0]: operators.registry.materialize(atoms.SIGNS[0], first_spec),
-            atoms.SIGNS[1]: operators.registry.materialize(atoms.SIGNS[1], second_spec),
+            atoms.signs()[0]: operators.registry.materialize(atoms.signs()[0], first_spec),
+            atoms.signs()[1]: operators.registry.materialize(atoms.signs()[1], second_spec),
         }
         self.chorus = chorus
         self.transcript = []
@@ -45,10 +46,10 @@ class Match:
 def _murmur(snapshot):
     if snapshot["dominant"]:
         seam = ", ".join(atoms.thread_members(snapshot))
-        return f"{VOCABLES['crown']}={snapshot['dominant']} {VOCABLES['thread']}={seam}"
+        return f"{_vocables()['crown']}={snapshot['dominant']} {_vocables()['thread']}={seam}"
     if snapshot["spent"]:
-        return f"{VOCABLES['crown']}={VOCABLES['void']} {VOCABLES['thread']}={VOCABLES['still']}"
-    return f"{VOCABLES['turn']}={snapshot['phase']} {VOCABLES['hatch']}={','.join(snapshot['vacancy'])}"
+        return f"{_vocables()['crown']}={_vocables()['void']} {_vocables()['thread']}={_vocables()['still']}"
+    return f"{_vocables()['turn']}={snapshot['phase']} {_vocables()['hatch']}={','.join(snapshot['vacancy'])}"
 
 
 

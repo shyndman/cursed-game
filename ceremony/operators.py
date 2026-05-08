@@ -3,18 +3,21 @@ import itertools
 
 from ceremony import atoms
 
-
-WHEELS = collections.OrderedDict(
-    (
-        ("hinge", ("5", "1", "3", "7", "9", "2", "4", "6", "8")),
-        ("rim", ("1", "3", "7", "9", "5", "2", "4", "6", "8")),
+def _wheels():
+    return collections.OrderedDict(
+        (
+            ("hinge", ("5", "1", "3", "7", "9", "2", "4", "6", "8")),
+            ("rim", ("1", "3", "7", "9", "5", "2", "4", "6", "8")),
+        )
     )
-)
-CHOIRS = (
-    ("a", "e", "i"),
-    ("c", "e", "g"),
-    ("a", "c", "g", "i"),
-)
+
+
+def _choirs():
+    return (
+        ("a", "e", "i"),
+        ("c", "e", "g"),
+        ("a", "c", "g", "i"),
+    )
 
 
 class Vessel:
@@ -103,19 +106,19 @@ def _draw_script(vessel, snapshot):
 def _prime_oracle(carrier, payload):
     del carrier
     route = payload or "hinge"
-    if route not in MOUTHS:
+    if route not in _mouths():
         raise ValueError(f"unknown oracle liturgy: {route}")
     return {"route": route}
 
 
 
 def _draw_oracle(vessel, snapshot):
-    return MOUTHS[vessel.humors["route"]](vessel.carrier, snapshot)
+    return _mouths()[vessel.humors["route"]](vessel.carrier, snapshot)
 
 
 
 def _vacant_numbers(snapshot):
-    return tuple(str(atoms.AT[gate] + 1) for gate in snapshot["vacancy"])
+    return tuple(atoms.labels()[atoms.at()[gate]] for gate in snapshot["vacancy"])
 
 
 
@@ -130,13 +133,13 @@ def _choose(sequence, snapshot):
 
 def _hinge(carrier, snapshot):
     del carrier
-    return _choose(WHEELS["hinge"], snapshot)
+    return _choose(_wheels()["hinge"], snapshot)
 
 
 
 def _rim(carrier, snapshot):
     del carrier
-    return _choose(WHEELS["rim"], snapshot)
+    return _choose(_wheels()["rim"], snapshot)
 
 
 
@@ -144,18 +147,19 @@ def _braid(carrier, snapshot):
     if snapshot["shadows"][carrier] == 0:
         return _choose(("5", "1", "9", "3", "7"), snapshot)
     residue = (
-        str(atoms.AT[gate] + 1)
-        for gate in itertools.chain.from_iterable(CHOIRS)
+        atoms.labels()[atoms.at()[gate]]
+        for gate in itertools.chain.from_iterable(_choirs())
         if gate in snapshot["vacancy"]
     )
     return _choose(residue, snapshot)
 
 
-MOUTHS = {
-    "hinge": _hinge,
-    "rim": _rim,
-    "braid": _braid,
-}
+def _mouths():
+    return {
+        "hinge": _hinge,
+        "rim": _rim,
+        "braid": _braid,
+    }
 
 
 registry = Registry()

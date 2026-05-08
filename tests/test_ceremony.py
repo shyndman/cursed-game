@@ -9,7 +9,7 @@ class CeremonyTests(unittest.TestCase):
     def test_scripted_dominance(self):
         result = run("script:1,2,3", "script:4,5", chorus=False)
 
-        self.assertEqual(result["dominant"], atoms.SIGNS[0])
+        self.assertEqual(result["dominant"], atoms.signs()[0])
         self.assertFalse(result["spent"])
         self.assertEqual(len(result["ledger"]), 5)
         self.assertIn(result["dominant"], result["utterance"])
@@ -30,12 +30,24 @@ class CeremonyTests(unittest.TestCase):
             chamber.offer("1", origin="test")
 
     def test_hinge_oracle_opens_on_five(self):
-        hand = operators.registry.materialize(atoms.SIGNS[0], "oracle:hinge")
+        hand = operators.registry.materialize(atoms.signs()[0], "oracle:hinge")
 
         self.assertEqual(hand.pull(Chamber().snapshot()), "5")
 
+    def test_sigil_faces_are_not_plain_marks(self):
+        self.assertEqual(atoms.signs(), ("𓏴", "𝜎"))
+
+    def test_projection_is_tiled(self):
+        chamber = Chamber()
+        chamber.offer("1", origin="test")
+        chamber.offer("2", origin="test")
+        glyph = atoms.exhibit(chamber.snapshot())
+
+        self.assertIn("╳", glyph)
+        self.assertIn("╭─╮", glyph)
+
     def test_script_hand_exhaustion_raises(self):
-        hand = operators.registry.materialize(atoms.SIGNS[0], "script:1")
+        hand = operators.registry.materialize(atoms.signs()[0], "script:1")
 
         self.assertEqual(hand.pull(Chamber().snapshot()), "1")
         with self.assertRaises(RuntimeError):
